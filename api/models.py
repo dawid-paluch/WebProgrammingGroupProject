@@ -26,7 +26,7 @@ class AuctionItem(models.Model):
         end_datetime (datetime): The date and time when the auction ends.
 
     """
-    owner = models.CharField(max_length=100)
+    owner = models.ForeignKey('User', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
     starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
