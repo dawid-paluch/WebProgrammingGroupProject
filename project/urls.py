@@ -17,10 +17,21 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.http import HttpResponse
+from django.conf.urls.static import static
+from django.views.generic import TemplateView
+#from .views import main_spa
 
 
 urlpatterns = [
-    path('', include('api.urls')),
+    # path('', main_spa),
+    path('api/', include('api.urls')),
     path('health', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),
+    path('', TemplateView.as_view(template_name='index.html')),
+    
 ]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
