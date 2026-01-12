@@ -21,11 +21,11 @@
                 v-for="item in items"
                 :key="item.id"
                 class="item-card"
+                :class="{ 'ending-soon': new Date(item.end_datetime).getTime() - Date.now() < 24 * 60 * 60 * 1000 }"
                 @click="goToItem(item.id)"
             >
                 <img
-                    v-if="item.image"
-                    :src="item.image"
+                    :src="item.image ?? '/static/api/spa/assets/placeholder.jpg'"
                     alt="Item Image"
                 />
 
@@ -38,7 +38,7 @@
                 </p>
 
                 <p class="end-time">
-                Ends at: {{ new Date(item.end_datetime).toLocaleString() }}
+                    {{ formatEndTime(item.end_datetime) }}
                 </p>
         
             </div>
@@ -59,6 +59,20 @@ interface AuctionItem {
     current_bid: string | null;
     end_datetime: string;
 }
+
+const formatEndTime = (end: string) => {
+    const endDate = new Date(end);
+    const now = new Date();
+    const diff = endDate.getTime() - now.getTime();
+
+    if (diff <= 0) return 'Auction ended';
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+    return `Ends in ${days}d ${hours}h ${minutes}m`;
+};
 
 export default defineComponent({
     name: 'AuctionItemList',
@@ -118,6 +132,7 @@ export default defineComponent({
             goToItem,
             debouncedFetch,
             formatBid,
+            formatEndTime,
         };
     },
 })
@@ -156,7 +171,8 @@ export default defineComponent({
 }
 
 .item-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
 .item-card img {
@@ -171,10 +187,15 @@ export default defineComponent({
     font-size: 14px;
     color: #555;
     margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
 }
 
 .item-card .price {
     font-weight: bold;
+    color: #1a73e8;
     margin-bottom: 5px;
 }
 
@@ -187,6 +208,10 @@ export default defineComponent({
     font-size: 18px;
     text-align: center;
     margin: 20px 0;
+}
+
+.item-card.ending-soon {
+    border: 2px solid red;
 }
 
 </style>

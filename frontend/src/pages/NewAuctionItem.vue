@@ -1,42 +1,38 @@
 <template>
-    <div class="new-auction-item">
-         
-        <h1>Create New Auction Item</h1>
+  <div class="new-auction-item">
+    <h1>Create New Auction Item</h1>
 
-        <form @submit.prevent="submitForm">
-            <div>
-                <label for="title">Title:</label>
-                <input type="text" id="title" v-model="title" required />
-            </div>
+    <form @submit.prevent="submitForm">
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" id="title" v-model="title" required />
+      </div>
 
-            <div>
-                <label for="description">Description:</label>
-                <textarea id="description" v-model="description" required></textarea>
-            </div>
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" v-model="description" required></textarea>
+      </div>
 
-            <div>
-                <label for="startingBid">Starting Bid:</label>
-                <input type="number" id="startingBid" v-model="startingBid" required />
-            </div>
+      <div class="form-group">
+        <label for="startingBid">Starting Bid:</label>
+        <input type="number" id="startingBid" v-model="startingBid" required />
+      </div>
 
-            <div>
-                <label for="endDate">End Date:</label>
-                <input type="datetime-local" id="endDate" v-model="endDate" required />
-            </div>
+      <div class="form-group">
+        <label for="endDate">End Date:</label>
+        <input type="datetime-local" id="endDate" v-model="endDate" required />
+      </div>
 
-            <div>
-                <label for="image">Image:</label>
-                <input type="file" id="image" @change="handleFileUpload" />
-            </div>
+      <div class="form-group">
+        <label for="image">Image:</label>
+        <input type="file" id="image" @change="handleFileUpload" />
+      </div>
 
-            <button type="submit">Create Auction Item</button>
-            
-        </form>
+      <button type="submit" class="submit-btn">Create Auction Item</button>
+    </form>
 
-        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-    
-    </div>
-
+    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+  </div>
 </template>
 
 <script lang="ts">
@@ -134,16 +130,70 @@ export default defineComponent({
 <style scoped>
 .new-auction-item {
     max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
+    margin: 40px auto;
+    padding: 30px;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 1);
+    font-family: Arial , sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+textarea,
+input[type="file"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.submit-btn:hover {
+    background-color: #1669c1;
+    transform: translateY(-2px);
 }
 
 .error {
     color: red;
-    margin-top: 10px;
+    margin-top: 15px;
+    text-align: center;
 }
 
 </style>
