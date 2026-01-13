@@ -19,11 +19,15 @@ from django.urls import include, path
 from django.http import HttpResponse
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
-#from .views import main_spa
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import AuthenticationForm
+
 
 
 urlpatterns = [
-    # path('', main_spa),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=AuthenticationForm), name='login'),
     path('api/', include('api.urls')),
     path('health', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),
