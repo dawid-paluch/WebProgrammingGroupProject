@@ -15,7 +15,8 @@
 
       <div class="form-group">
         <label for="startingBid">Starting Bid:</label>
-        <input type="number" id="startingBid" v-model="startingBid" required />
+        <input type="number" id="startingBid" v-model="startingBid" step="0.01" min="0" placeholder="0.00" />
+    
       </div>
 
       <div class="form-group">
@@ -107,7 +108,7 @@ export default defineComponent({
             }
 
             const createdItem = await response.json();
-            router.push(`/items/${createdItem.id}`);
+            router.push(`/item/${createdItem.id}`);
         } catch (error) {
             errorMessage.value = (error as Error).message;
         }
