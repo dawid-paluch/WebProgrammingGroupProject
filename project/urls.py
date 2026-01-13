@@ -19,6 +19,7 @@ from django.urls import include, path
 from django.http import HttpResponse
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
+from .views.profile import profile_data, update_profile
 #from .views import main_spa
 
 
@@ -28,7 +29,8 @@ urlpatterns = [
     path('health', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='index.html')),
-    
+    path('api/profile/', profile_data, name='profile_data'),
+    path('api/profile/update/', update_profile, name='update_profile'),
 ]
 
 # Serve media files during development
