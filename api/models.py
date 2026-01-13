@@ -40,3 +40,33 @@ class AuctionItem(models.Model):
         """
 
         return self.title
+    
+
+class ItemQuestion(models.Model):
+
+    """
+    Model representing a question asked about an auction item.
+
+    Attributes:
+        item (ForeignKey): The auction item the question is about.
+        asked_by (str): The user who asked the question.
+        question_text (str): The text of the question.
+        answer_text (str): The text of the answer (if answered).
+        asked_at (datetime): The date and time when the question was asked.
+        answered_at (datetime): The date and time when the question was answered (if answered).
+    """
+    
+    item = models.ForeignKey(
+        AuctionItem, 
+        related_name='questions', 
+        on_delete=models.CASCADE
+    )
+
+    asked_by = models.CharField(max_length=100)
+    question_text = models.TextField()
+    answer_text = models.TextField(null=True, blank=True)
+    asked_at = models.DateTimeField(auto_now_add=True)
+    answered_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Question by {self.asked_by} on {self.item.title}"
