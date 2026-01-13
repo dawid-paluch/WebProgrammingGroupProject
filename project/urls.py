@@ -23,11 +23,13 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import AuthenticationForm
+from api import views as api_views
 
 
 
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=AuthenticationForm), name='login'),
+    path('signup/', api_views.signup, name='signup'),
     path('api/', include('api.urls')),
     path('health', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),

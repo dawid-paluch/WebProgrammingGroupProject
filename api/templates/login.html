@@ -1,54 +1,15 @@
-<!-- <!doctype html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/static/api/spa/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Auction Login Page</title>
-  <script type="module" crossorigin src="/static/api/spa/assets/index-DbBstqHX.js"></script>
-  <link rel="stylesheet" crossorigin href="/static/api/spa/assets/index-C11chwFa.css">
-</head>
-
-<body>
-    <div id="login">
-        <h1>Login to Auction Site</h1>
-        <form id="login-form">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required />
-            <br />
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required />
-            <br />
-            <button type="submit">Login</button>
-        </form>
-
-        <h1>Login</h1>
-        <form method="post">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit">Log in</button>
-        </form>
-    </div>
-</body>
-
-</html> -->
-
 <!doctype html>
 <html>
   <head>
       <meta charset="UTF-8" />
-      <link rel="icon" type="image/svg+xml" href="/static/api/spa/vite.svg" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Auction Login Page</title>
-    <script type="module" crossorigin src="/static/api/spa/assets/index-DbBstqHX.js"></script>
-    <link rel="stylesheet" crossorigin href="/static/api/spa/assets/index-C11chwFa.css">
   </head>
 
   <body>
     <h1>Log in</h1>
 
-    <form method="post" novalidate>
+    <form method="post" action="{% url 'login' %}" novalidate>
       {% csrf_token %}
 
       <div>
@@ -70,11 +31,14 @@
       <button type="submit">Log in</button>
     </form>
 
+    <p>
+      Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
+    </p>
+
     {% if form.non_field_errors %}
     <div >
       {{ form.non_field_errors }}
     </div>
     {% endif %}
-    
   </body>
 </html>
