@@ -33,7 +33,7 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('health', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='index.html')),
+    path('', TemplateView.as_view(template_name='api/spa/index.html')),
     
 ]
 

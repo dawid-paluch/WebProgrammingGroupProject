@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework import permissions, viewsets
 from .models import AuctionItem
 from .serializers import AuctionItemSerializer
@@ -58,14 +58,14 @@ class SignUpForm(UserCreationForm):
 
 def signup(request):
     if request.user.is_authenticated:
-        return redirect("")
+        return redirect("/")
 
     if request.method == "POST":
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("")
+            return redirect("/")
     else:
         form = SignUpForm()
 
