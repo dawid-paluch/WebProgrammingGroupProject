@@ -67,6 +67,7 @@ class ItemQuestion(models.Model):
     answer_text = models.TextField(null=True, blank=True)
     asked_at = models.DateTimeField(auto_now_add=True)
     answered_at = models.DateTimeField(null=True, blank=True)
+    
 
     def __str__(self):
         return f"Question by {self.asked_by} on {self.item.title}"

@@ -35,11 +35,38 @@
         </div>
 
         <div v-else>
-          <div v-for="question in questions" :key="question.id" class="question-item">
-            <p><strong>Q:</strong> {{ question.question_text }}</p>
-            <p v-if="question.answer_text"><strong>A:</strong> {{ question.answer_text }}</p>
-            <p v-else><em>No answer yet.</em></p>
-          </div>
+            <div
+                v-for="question in questions"
+                :key="question.id"
+                class="question-item"
+            >
+                <p><strong>Q:</strong> {{ question.question_text }}</p>
+
+                <!-- If answered -->
+                <p v-if="question.answer_text">
+                <strong>A:</strong> {{ question.answer_text }}
+                </p>
+
+                <!-- If NOT answered -->
+                <div v-else class="answer-form">
+                <em>No answer yet.</em>
+
+                <!-- Placeholder owner answer form -->
+                <form @submit.prevent="submitAnswer(question)">
+                    <textarea
+                    v-model="question.newAnswer"
+                    placeholder="Write an answer..."
+                    rows="2"
+                    class="question-input"
+                    required
+                    ></textarea>
+
+                    <button type="submit">
+                    Answer Question
+                    </button>
+                </form>
+                </div>
+            </div>
         </div>
 
         <div class="ask-question">
@@ -154,6 +181,37 @@ export default defineComponent({
         }
     };
 
+    const submitAnswer = async (question: any) => {
+        if (!question.newAnswer?.trim()) return;
+
+        try {
+            const response = await fetch(
+            `http://127.0.0.1:8000/api/item-questions/${question.id}/answer/`,
+            {
+                method: 'PATCH',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                answer_text: question.newAnswer
+                })
+            }
+            );
+
+            if (!response.ok) throw new Error('Failed to submit answer');
+
+            const updated = await response.json();
+
+            question.answer_text = updated.answer_text;
+            question.newAnswer = '';
+
+        } catch (err) {
+            console.error(err);
+    }
+    };
+
+
+
         onMounted(() => {
             const itemId = Number(route.params.id);
             if (!isNaN(itemId)) {
@@ -169,7 +227,9 @@ export default defineComponent({
             newQuestion,
             questionError,
             submitQuestion,
-            questions
+            questions,
+            fetchError,
+            submitAnswer
         };
     }
 });
@@ -300,4 +360,29 @@ export default defineComponent({
     margin-top: 40px;
     text-align: center;
 }
+
+.answer-box {
+    margin-top: 8px;
+}
+
+.answer-box textarea {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 6px;
+}
+
+.answer-form button {
+    background-color: #34a853;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.answer-form button:hover {
+    background-color: #2c8c47;
+}
+
+
 </style>

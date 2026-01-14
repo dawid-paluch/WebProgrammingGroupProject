@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.shortcuts import render
 from rest_framework import permissions, viewsets
@@ -7,7 +8,9 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from .models import ItemQuestion
 from .serializers import ItemQuestionSerializer
-
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 
 
 def main_spa(request: HttpRequest) -> HttpResponse:
@@ -56,11 +59,29 @@ class ItemQuestionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Returns onlt questions related to a specific auction item
+        Returns only questions related to a specific auction item
         """
 
         item_id = self.request.query_params.get('item_id', None)
         if item_id:
             return ItemQuestion.objects.filter(item_id=item_id)
         return ItemQuestion.objects.all()
+    
+    @action(detail=True, methods=['patch', 'post'])
+    def answer(self, request, pk=None):
+        """
+        Custom action to answer a question.
+        """
+        question = self.get_object()
+        answer_text = request.data.get('answer_text', '').strip()
+
+        if not answer_text:
+            return Response({'error': 'Answer text is required.'}, status=status.HTTP_400_BAD_REQUEST)  
+        
+        question.answer_text = answer_text
+        question.answered_at = timezone.now()
+        question.save()
+
+        serializer = self.get_serializer(question)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
