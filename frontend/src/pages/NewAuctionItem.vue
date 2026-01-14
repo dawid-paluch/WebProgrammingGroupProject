@@ -16,7 +16,6 @@
       <div class="form-group">
         <label for="startingBid">Starting Bid:</label>
         <input type="number" id="startingBid" v-model="startingBid" step="0.01" min="0" placeholder="0.00" />
-    
       </div>
 
       <div class="form-group">
@@ -39,17 +38,20 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuctionStore } from '../stores/auctionStore';   
 
 export default defineComponent({
     name: 'NewAuctionItem',
     setup() {
+        const auctionStore = useAuctionStore();
+        const router = useRouter();
+
         const title = ref('');
         const description = ref('');
         const startingBid = ref(0);
         const endDate = ref('');
-        const imageFile = ref(null);
+        const imageFile = ref<File | null>(null);
         const errorMessage = ref('');
-        const router = useRouter();
 
 
         const handleFileUpload = (event : Event) => {
@@ -60,59 +62,29 @@ export default defineComponent({
         };
 
         const submitForm = async () => {
-        console.log('submitForm called', endDate.value);
+            errorMessage.value = '';
 
-        const formData = new FormData();
-        formData.append('owner', 'test_user');
-        formData.append('title', title.value.trim());
-        formData.append('description', description.value.trim());
-        formData.append('starting_bid', Number(startingBid.value).toFixed(2));
-
-        if (endDate.value) {
-            const formattedEndDate = endDate.value.length === 16 
-                ? endDate.value + ':00' 
-                : endDate.value;
-            console.log('Sending end_datetime (local format):', formattedEndDate);
-            formData.append('end_datetime', formattedEndDate);
-        }
-
-        if (imageFile.value) {
-            formData.append('image', imageFile.value);
-        }
-
-        // log all formData entries
-        for (const [key, value] of (formData as any).entries()) {
-            console.log('FormData:', key, value);
-        }
-
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/auction-items/', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const text = await response.text();
-                console.log('Raw response from backend:', text);
-
-                try {
-                    const data = JSON.parse(text);
-                    console.log('Parsed JSON backend errors:', data);
-                    errorMessage.value = Object.values(data)
-                        .map(v => Array.isArray(v) ? v.join(', ') : v)
-                        .join(', ');
-                } catch {
-                    errorMessage.value = text || `Request failed with status ${response.status}`;
-                }
+            if (!title.value || !description.value || !endDate.value) {
+                errorMessage.value = 'Please fill in all required fields.';
                 return;
             }
 
-            const createdItem = await response.json();
-            router.push(`/item/${createdItem.id}`);
-        } catch (error) {
-            errorMessage.value = (error as Error).message;
-        }
-    };
+            try {
+                // call the Pinia store method
+                const createdItem = await auctionStore.createItem({
+                title: title.value.trim(),
+                description: description.value.trim(),
+                startingBid: Number(startingBid.value),
+                endDate: endDate.value.length === 16 ? endDate.value + ':00' : endDate.value,
+                imageFile: imageFile.value,
+                });
+
+                // navigate to the newly created item's page
+                router.push(`/item/${createdItem.id}`);
+            } catch (error: any) {
+                errorMessage.value = error.message || 'Failed to create auction item.';
+            }
+            };
 
         return {
             title,
@@ -123,6 +95,7 @@ export default defineComponent({
             handleFileUpload,
             submitForm,
             errorMessage,
+            
         };
     },
 });

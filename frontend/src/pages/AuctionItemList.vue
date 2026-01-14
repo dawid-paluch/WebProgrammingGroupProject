@@ -34,13 +34,13 @@
                 <p class="description">{{ item.description }}</p>
 
                 <p class="price">
-                    Current Bid: £{{ formatBid(item.current_bid, item.starting_bid) }}
+                    Current Bid: £{{ formatBid(item.currentBid, item.startingBid) }}
                 </p>
 
                 <p class="end-time">
-                    {{ formatEndTime(item.end_datetime) }}
+                    {{ formatEndTime(item.endDate) }}
                 </p>
-        
+
             </div>
         </div>
     </div>
@@ -49,16 +49,8 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuctionStore, AuctionItem } from '../stores/auctionStore';
 
-interface AuctionItem {
-    id: number;
-    title: string;
-    description: string;
-    image: string | null;
-    starting_bid: string;
-    current_bid: string | null;
-    end_datetime: string;
-}
 
 const formatEndTime = (end: string) => {
     const endDate = new Date(end);
@@ -77,10 +69,12 @@ const formatEndTime = (end: string) => {
 export default defineComponent({
     name: 'AuctionItemList',
     setup() {
-        const items = ref<AuctionItem[]>([]);
+        const auctionStore = useAuctionStore();
+        const items = auctionStore.items;
         const searchQuery = ref('');
         const loading = ref(false);
         const router = useRouter();
+
 
         function debounce(func: (...args: any[]) => void, wait: number) {
             let timeout: number | undefined;
@@ -92,47 +86,34 @@ export default defineComponent({
             };
         }
 
-        const formatBid = (current: string | null, starting: string) => {
-            const bid = current ?? starting; 
-            return parseFloat(bid).toFixed(2);
+        const formatBid = (current: number, starting: number) => {
+            return (current || starting).toFixed(2);
         };
 
-        const fetchAuctionItems = async () => {
+        const fetchItemsDebounced = debounce(async () => {
             loading.value = true;
-            try {
-                const response = await fetch(
-                    `http://127.0.0.1:8000/api/auction-items/?search=${encodeURIComponent(searchQuery.value)}`
-                );
-
-                if (!response.ok) throw new Error('Failed to fetch auction items');
-
-                items.value = await response.json();
-            } catch (error) {
-                console.error('Error fetching auction items:', error);
-            } finally {
-                loading.value = false;
-            }
-        };
-
-        const debouncedFetch = debounce(fetchAuctionItems, 300);
+            await auctionStore.fetchItems(searchQuery.value);
+            loading.value = false;
+        }, 300);
 
         const goToItem = (itemId: number) => {
             router.push({ name: 'AuctionItemDetail', params: { id: itemId } });
         };
 
-        onMounted(() => {
-            fetchAuctionItems();
+        onMounted(async () => {
+            loading.value = true;
+            await auctionStore.fetchItems();
+            loading.value = false;
         });
 
         return {
             items,
             searchQuery,
             loading,
-            fetchAuctionItems,
             goToItem,
-            debouncedFetch,
             formatBid,
             formatEndTime,
+            debouncedFetch: fetchItemsDebounced,
         };
     },
 })

@@ -106,23 +106,18 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
-
-interface AuctionItem {
-    id: number;
-    title: string;
-    description: string;
-    startingBid: number;
-    currentBid: number;
-    imageUrl: string | null;
-    endDate: string;
-}
+import { useAuctionStore, AuctionItem } from '../stores/auctionStore';
 
 export default defineComponent({
     name: 'AuctionItemDetail',
     setup() {
+        const auctionStore = useAuctionStore();
         const route = useRoute();
-        const item = ref<AuctionItem | null>(null);
-        const questions = ref<any[]>([]); // <-- move it here
+        const itemId = Number(route.params.id);
+
+        const item = computed(() => auctionStore.getItem(itemId));
+
+        const questions = ref<any[]>([]);
         const placeholderUrl = '/static/api/spa/assets/placeholder.jpg';
         const newQuestion = ref('');
         const questionError = ref('');
@@ -141,13 +136,9 @@ export default defineComponent({
         const fetchItemDetails = async (id: number) => {
             try {
                 const response = await fetch(`http://127.0.0.1:8000/api/auction-items/${id}/`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch item details');
-                }
                 const data = await response.json();
 
-                // Map backend snake_case to frontend camelCase
-                item.value = {
+                const updatedItem: AuctionItem = {
                     id: data.id,
                     title: data.title,
                     description: data.description,
@@ -156,10 +147,13 @@ export default defineComponent({
                     imageUrl: data.image,
                     endDate: data.end_datetime
                 };
+
+                auctionStore.setItem(updatedItem); // ✅ only update store
             } catch (error) {
                 fetchError.value = 'Failed to load item details.';
                 console.error(error);
-            }}
+            }
+        };
 
         const fetchQuestions = async (itemId: number) => {
         try {
@@ -238,10 +232,10 @@ export default defineComponent({
         formData.append('bid_amount', newBid.value!.toString());
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/auction-items/${item.value.id}/place_bid/`, {
-            method: 'POST',
-            body: formData
-        });
+            const response = await fetch(
+                `http://127.0.0.1:8000/api/auction-items/${item.value.id}/place_bid/`,
+                { method: 'POST', body: formData }
+            );
 
             if (!response.ok) {
                 const errData = await response.json();
@@ -250,25 +244,19 @@ export default defineComponent({
 
             const updatedItem = await response.json();
 
-            item.value = {
-                ...item.value,
-                currentBid: parseFloat(updatedItem.current_bid) 
-            };
+            // ✅ Update the store instead of the computed
+            auctionStore.updateBid(item.value.id, parseFloat(updatedItem.current_bid));
 
             newBid.value = null;
             bidError.value = '';
-
             bidUpdated.value = true;
-            setTimeout(() => {
-                bidUpdated.value = false;
-            }, 1200);
-
-
+            setTimeout(() => (bidUpdated.value = false), 1200);
 
         } catch (err) {
             bidError.value = (err as Error).message;
         }
     };
+
 
 
         onMounted(() => {
