@@ -1,3 +1,4 @@
+from urllib import request
 from django.utils import timezone
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.shortcuts import render
@@ -43,6 +44,33 @@ class AuctionItemViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner='test_user')  # Placeholder for actual user assignment logic
 
+    @action(detail=True, methods=['post'])
+    def place_bid(self, request, pk=None):
+        """
+        Custom action to place a bid on an auction item.
+        """
+    
+        item = self.get_object()
+        bid_amount = request.data.get('bid_amount', None)
+    
+        if bid_amount is None:
+            return Response({'error': 'Bid amount is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            bid_amount = float(bid_amount)
+        except ValueError:
+            return Response({'error': 'Invalid bid amount.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        current = item.current_bid or item.starting_bid
+        if bid_amount <= current:
+            return Response({'error': 'Bid amount must be higher than the current bid.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        item.current_bid = bid_amount
+        item.save()
+
+        serializer = self.get_serializer(item)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 class ItemQuestionViewSet(viewsets.ModelViewSet):
     """

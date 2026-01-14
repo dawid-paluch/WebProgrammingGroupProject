@@ -21,10 +21,26 @@
         <div class="item-info">
           <p class="description"><strong>Description:</strong> {{ item.description }}</p>
           <p class="price"><strong>Starting Bid:</strong> ${{ item.startingBid.toFixed(2) }}</p>
-          <p class="price"><strong>Current Bid:</strong> ${{ item.currentBid.toFixed(2) }}</p>
+          <p class="price" :class="{ 'bid-flash': bidUpdated }">
+            <strong>Current Bid:</strong> ${{ item.currentBid.toFixed(2) }}
+        </p>
           <p class="end-time"><strong>Auction Ends:</strong> {{ formatEndDate(item.endDate) }}</p>
         </div>
       </div>
+
+      <div class="place-bid">
+        <h3 class="place-bid-title">Place a Bid</h3>
+        <input type="number" placeholder="Enter your bid amount" class="bid-input" v-model.number="newBid" min="0" />
+        <button
+            class="bid-button"
+            @click="submitBid"
+            :disabled="!newBid || newBid <= item.currentBid"
+            >
+            Submit Bid
+        </button>
+        <p v-if="bidError" class="error-message">{{ bidError }}</p>
+    </div>
+    
 
       <!-- Questions & Answers section -->
       <div class="item-questions">
@@ -111,6 +127,10 @@ export default defineComponent({
         const newQuestion = ref('');
         const questionError = ref('');
         const fetchError = ref('');
+        const newBid = ref<number | null>(null);
+        const bidError = ref('');
+        const bidUpdated = ref(false);
+
 
 
         const formatEndDate = (end: string) => {
@@ -207,9 +227,48 @@ export default defineComponent({
 
         } catch (err) {
             console.error(err);
-    }
+        }
     };
 
+
+    const submitBid = async () => {
+        if (!item.value || newBid.value === null) return;
+
+        const formData = new FormData();
+        formData.append('bid_amount', newBid.value!.toString());
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/auction-items/${item.value.id}/place_bid/`, {
+            method: 'POST',
+            body: formData
+        });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.error || 'Failed to place bid.');
+            }
+
+            const updatedItem = await response.json();
+
+            item.value = {
+                ...item.value,
+                currentBid: parseFloat(updatedItem.current_bid) 
+            };
+
+            newBid.value = null;
+            bidError.value = '';
+
+            bidUpdated.value = true;
+            setTimeout(() => {
+                bidUpdated.value = false;
+            }, 1200);
+
+
+
+        } catch (err) {
+            bidError.value = (err as Error).message;
+        }
+    };
 
 
         onMounted(() => {
@@ -229,7 +288,11 @@ export default defineComponent({
             submitQuestion,
             questions,
             fetchError,
-            submitAnswer
+            submitAnswer,
+            newBid,
+            bidError,
+            submitBid,
+            bidUpdated
         };
     }
 });
@@ -384,5 +447,55 @@ export default defineComponent({
     background-color: #2c8c47;
 }
 
+.place-bid-title {
+    margin-top: 20px;
+}
+
+.bid-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.bid-button {
+    background-color: #1a73e8;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.bid-button:hover {
+    background-color: #155ab6;
+}
+
+.bid-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.bid-flash {
+  display: inline-block; /* ensures scaling doesn't push content */
+  animation: bidPop 0.6s ease-in-out;
+}
+
+@keyframes bidPop {
+  0%, 100% {
+    color: #1a73e8;   /* normal blue */
+    transform: scale(1); 
+  }
+  50% {
+    color: #28a745;   /* flash green */
+    transform: scale(1.2); /* slightly bigger */
+    font-weight: bold;
+  }
+}
 
 </style>
