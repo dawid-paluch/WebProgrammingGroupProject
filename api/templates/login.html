@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Auction Login Page</title>
+  </head>
+
+  <body>
+    <h1>Log in</h1>
+
+    <form method="post" action="{% url 'login' %}" novalidate>
+      {% csrf_token %}
+
+      <div>
+        <label for="{{ form.username.id_for_label }}">Username</label><br />
+        {{ form.username }}
+        {% if form.username.errors %}
+        <div>{{ form.username.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label for="{{ form.password.id_for_label }}">Password</label><br />
+        {{ form.password }}
+        {% if form.password.errors %}
+        <div>{{ form.password.errors }}</div>
+        {% endif %}
+      </div>
+
+      <button type="submit">Log in</button>
+    </form>
+
+    <p>
+      Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
+    </p>
+
+    {% if form.non_field_errors %}
+    <div >
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+  </body>
+</html>

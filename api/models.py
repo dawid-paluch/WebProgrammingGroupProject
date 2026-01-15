@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
@@ -25,7 +26,7 @@ class AuctionItem(models.Model):
         end_datetime (datetime): The date and time when the auction ends.
 
     """
-    owner = models.CharField(max_length=100)
+    owner = models.ForeignKey('User', on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
     starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
@@ -40,3 +41,24 @@ class AuctionItem(models.Model):
         """
 
         return self.title
+
+
+class User(AbstractUser):
+    """
+    Model representing a custom user in the system.
+    
+    Attributes:
+        username (str): The username of the user.
+        email (str): The email address of the user.
+        password (str): The password for the user account.
+        date_of_birth (date): The date of birth of the user.
+
+    """
+    date_of_birth = models.DateField(null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+
+    def __str__(self):
+        """
+        Return a string representation of the User.
+        """
+        return self.username

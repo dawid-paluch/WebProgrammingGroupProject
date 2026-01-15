@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import AuctionItem, User, PageView
+
+
+admin.site.register(AuctionItem)
+admin.site.register(User)
+admin.site.register(PageView)
