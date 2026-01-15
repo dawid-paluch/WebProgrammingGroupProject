@@ -19,10 +19,11 @@ from django.urls import include, path
 from django.http import HttpResponse
 from rest_framework.routers import DefaultRouter
 
-from .views import AuctionItemViewSet
+from .views import AuctionItemViewSet, ItemQuestionViewSet
 
 router = DefaultRouter()
 router.register(r'auction-items', AuctionItemViewSet, basename='auctionitem')
+router.register(r'item-questions', ItemQuestionViewSet, basename='itemquestion')
 
 urlpatterns = [
     path('', include(router.urls)),
