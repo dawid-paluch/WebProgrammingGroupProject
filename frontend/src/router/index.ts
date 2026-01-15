@@ -8,6 +8,7 @@ import MainPage from '../pages/MainPage.vue';
 import OtherPage from '../pages/OtherPage.vue';
 import NewAuctionItem from "../pages/NewAuctionItem.vue";
 import AuctionItemDetail from "../pages/AuctionItemDetail.vue";
+import AuctionItemList from "../pages/AuctionItemList.vue";
 import Profile from '../views/Profile.vue';
 
 let base = (import.meta.env.MODE == 'development') ? import.meta.env.BASE_URL : ''
@@ -22,6 +23,7 @@ const router = createRouter({
         { path: '/other/', name: 'Other Page', component: OtherPage },
         { path: '/new-auction-item/', name: 'New Auction Item', component: NewAuctionItem },
         { path: '/item/:id', name: 'AuctionItemDetail', component: AuctionItemDetail },
+        { path: '/auction-items', name: 'AuctionItemList', component: AuctionItemList },
         { path: '/profile/', name: 'Profile', component: Profile }
     ]
 })
