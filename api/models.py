@@ -92,7 +92,7 @@ class ItemQuestion(models.Model):
     
 
     def __str__(self):
-        return f"Question by {self.asked_by} on {self.item.title}"
+        return f"Question by {self.asked_by.username} on {self.item.title}"
 
 class ItemBid(models.Model):
     """
@@ -113,4 +113,4 @@ class ItemBid(models.Model):
         ordering = ['-amount', 'timestamp']
 
     def __str__(self):
-        return f"Bid of {self.amount} by {self.bidder} on {self.item.title}"
+        return f"Bid of {self.amount} by {self.bidder.username} on {self.item.title}"

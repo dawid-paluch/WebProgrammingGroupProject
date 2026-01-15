@@ -50,7 +50,7 @@ class AuctionItemViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(owner='test_user')  # Placeholder for actual user assignment logic
+        serializer.save(owner=self.request.user)  # Placeholder for actual user assignment logic
 
     @action(detail=True, methods=['post'])
     def place_bid(self, request, pk=None):

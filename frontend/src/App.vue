@@ -1,6 +1,7 @@
 <template>
     <main class="container pt-4">
-        <button @click="logout">Log out</button>
+        <button id="logout-button" @click="logout">Log out</button>
+        <button id="new-item-button" @click="$router.push('/new-auction-item/')">New Item</button>
 
         <RouterView class="flex-shrink-0" />
     </main>
@@ -39,4 +40,29 @@ export default defineComponent({
 </script>
 
 <style scoped>
+#logout-button {
+    position: absolute;
+    font-size: 1.2em;
+    top: 1em;
+    left: 1em;
+    padding: 0.4em 1em;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#new-item-button {
+    position: absolute;
+    font-size: 1.2em;
+    top: 1em;
+    right: 1em;
+    padding: 0.4em 1em;
+    background-color: #4dafff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
 </style>

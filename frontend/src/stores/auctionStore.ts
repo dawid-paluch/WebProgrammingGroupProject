@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
 export interface AuctionItem {
     id: number;
     title: string;
@@ -63,16 +68,19 @@ export const useAuctionStore = defineStore('auctionStore', () => {
         imageFile?: File | null;
     }) {
         const formData = new FormData();
-        formData.append('owner', 'test_user'); // replace with real user later
         formData.append('title', newItem.title);
         formData.append('description', newItem.description);
         formData.append('starting_bid', newItem.startingBid.toFixed(2));
         formData.append('end_datetime', newItem.endDate);
         if (newItem.imageFile) formData.append('image', newItem.imageFile);
 
+        const csrfToken = getCookie('csrftoken');
+
         const response = await fetch('http://127.0.0.1:8000/api/auction-items/', {
             method: 'POST',
             body: formData,
+            credentials: 'same-origin',
+            headers: csrfToken ? { 'X-CSRFToken': csrfToken } : {},
         });
 
         if (!response.ok) {
