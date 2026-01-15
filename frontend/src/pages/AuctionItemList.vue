@@ -21,11 +21,11 @@
                 v-for="item in items"
                 :key="item.id"
                 class="item-card"
-                :class="{ 'ending-soon': new Date(item.end_datetime).getTime() - Date.now() < 24 * 60 * 60 * 1000 }"
+                :class="{ 'ending-soon': new Date(item.endDate).getTime() - Date.now() < 24 * 60 * 60 * 1000 }"
                 @click="goToItem(item.id)"
             >
                 <img
-                    :src="item.image ?? '/static/api/spa/assets/placeholder.jpg'"
+                    :src="item.imageUrl ?? '/static/api/spa/assets/placeholder.jpg'"
                     alt="Item Image"
                 />
 
@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuctionStore, AuctionItem } from '../stores/auctionStore';
 
@@ -70,7 +70,7 @@ export default defineComponent({
     name: 'AuctionItemList',
     setup() {
         const auctionStore = useAuctionStore();
-        const items = auctionStore.items;
+        const items = computed(() => auctionStore.items);
         const searchQuery = ref('');
         const loading = ref(false);
         const router = useRouter();
