@@ -14,7 +14,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import ItemBid
 from .serializers import ItemBidSerializer
-from decimal import Decimalfrom django.contrib.auth import login, get_user_model
+#from decimal import Decimalfrom django.contrib.auth
+#from decimal import login, get_user_model
+from decimal import Decimal
+from django.contrib.auth import login, get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
