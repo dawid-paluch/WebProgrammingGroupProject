@@ -71,3 +71,26 @@ class ItemQuestion(models.Model):
 
     def __str__(self):
         return f"Question by {self.asked_by} on {self.item.title}"
+
+class ItemBid(models.Model):
+    """
+    Model representing a bid placed on an auction item.
+    """
+
+    item = models.ForeignKey(
+        AuctionItem, 
+        related_name='bids', 
+        on_delete=models.CASCADE
+    )
+    
+    bidder = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-amount', 'timestamp']
+
+    def __str__(self):
+        return f"Bid of {self.amount} by {self.bidder} on {self.item.title}"
+    
+    

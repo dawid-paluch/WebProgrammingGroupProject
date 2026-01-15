@@ -12,7 +12,9 @@ from .serializers import ItemQuestionSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-
+from .models import ItemBid
+from .serializers import ItemBidSerializer
+from decimal import Decimal
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
@@ -49,27 +51,29 @@ class AuctionItemViewSet(viewsets.ModelViewSet):
         """
         Custom action to place a bid on an auction item.
         """
-    
-        item = self.get_object()
-        bid_amount = request.data.get('bid_amount', None)
-    
-        if bid_amount is None:
-            return Response({'error': 'Bid amount is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
-            bid_amount = float(bid_amount)
-        except ValueError:
-            return Response({'error': 'Invalid bid amount.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        current = item.current_bid or item.starting_bid
-        if bid_amount <= current:
-            return Response({'error': 'Bid amount must be higher than the current bid.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        item.current_bid = bid_amount
-        item.save()
+            item = self.get_object()
+            bid_amount = request.data.get('bid_amount', None)
+            if bid_amount is None:
+                return Response({'error': 'Bid amount is required.'}, status=400)
 
-        serializer = self.get_serializer(item)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            bid_amount = float(bid_amount)
+            current = item.current_bid or item.starting_bid
+            if bid_amount <= current:
+                return Response({'error': 'Bid must be higher than current bid.'}, status=400)
+
+            item.current_bid = bid_amount
+            item.save()
+
+            bidder = request.data.get('bidder', 'test_bidder')
+            ItemBid.objects.create(item=item, bidder=bidder, amount=Decimal(bid_amount))
+
+            serializer = self.get_serializer(item)
+            return Response(serializer.data)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=500)
     
 
 class ItemQuestionViewSet(viewsets.ModelViewSet):
