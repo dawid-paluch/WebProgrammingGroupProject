@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { parse } from 'vue/compiler-sfc';
 
 function getCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]*)"));
@@ -51,7 +52,7 @@ export const useAuctionStore = defineStore('auctionStore', () => {
                 title: d.title,
                 description: d.description,
                 startingBid: parseFloat(d.starting_bid),
-                currentBid: d.current_bid ? parseFloat(d.current_bid) : 0,
+                currentBid: d.current_bid ? parseFloat(d.current_bid) : parseFloat(d.starting_bid),
                 imageUrl: d.image,
                 endDate: d.end_datetime,
             }));

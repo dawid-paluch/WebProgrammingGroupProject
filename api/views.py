@@ -33,7 +33,7 @@ class AuctionItemViewSet(viewsets.ModelViewSet):
     """
     queryset = AuctionItem.objects.all()
     serializer_class = AuctionItemSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
@@ -71,8 +71,7 @@ class AuctionItemViewSet(viewsets.ModelViewSet):
             item.current_bid = bid_amount
             item.save()
 
-            bidder = request.data.get('bidder', 'test_bidder')
-            ItemBid.objects.create(item=item, bidder=bidder, amount=Decimal(bid_amount))
+            ItemBid.objects.create(item=item, bidder=request.user, amount=Decimal(bid_amount))
 
             serializer = self.get_serializer(item)
             return Response(serializer.data)
@@ -90,10 +89,10 @@ class ItemQuestionViewSet(viewsets.ModelViewSet):
 
     queryset = ItemQuestion.objects.all()
     serializer_class = ItemQuestionSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save()  # Placeholder for actual user assignment logic
+        serializer.save(asked_by=self.request.user)
 
     def get_queryset(self):
         """

@@ -127,6 +127,10 @@ export default defineComponent({
         const bidUpdated = ref(false);
 
 
+        function getCookie(name: string): string | null {
+            const match = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]*)"));
+            return match ? decodeURIComponent(match[2]) : null;
+        }
 
         const formatEndDate = (end: string) => {
             const endDate = new Date(end);
@@ -168,20 +172,26 @@ export default defineComponent({
     const submitQuestion = async () => {
         if (!item.value || !newQuestion.value.trim()) return;
 
+        const csrfToken = getCookie('csrftoken');
+
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/item-questions/`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
                 },
                 body: JSON.stringify({
                     item: item.value.id,
                     question_text: newQuestion.value,
-                    asked_by: 'placeholder-user'
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to submit question');
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText);
+            }
+
 
             const createdQuestion = await response.json();
             questions.value.push(createdQuestion); // update list immediately
@@ -198,13 +208,16 @@ export default defineComponent({
     const submitAnswer = async (question: any) => {
         if (!question.newAnswer?.trim()) return;
 
+        const csrfToken = getCookie('csrftoken');
+
         try {
             const response = await fetch(
             `http://127.0.0.1:8000/api/item-questions/${question.id}/answer/`,
             {
                 method: 'PATCH',
                 headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { "X-CSRFToken": csrfToken } : {})
                 },
                 body: JSON.stringify({
                 answer_text: question.newAnswer
@@ -228,23 +241,30 @@ export default defineComponent({
     const submitBid = async () => {
         if (!item.value || newBid.value === null) return;
 
+        const csrfToken = getCookie('csrftoken');
+
         const formData = new FormData();
         formData.append('bid_amount', newBid.value!.toString());
 
         try {
             const response = await fetch(
                 `http://127.0.0.1:8000/api/auction-items/${item.value.id}/place_bid/`,
-                { method: 'POST', body: formData }
+                {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    headers: csrfToken ? { 'X-CSRFToken': csrfToken } : {}
+                }
             );
 
+            const data = await response.json().catch(() => ({}));
+
             if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || 'Failed to place bid.');
+                throw new Error(data.error || 'Failed to place bid.');
             }
 
-            const updatedItem = await response.json();
+            const updatedItem = data;
 
-            // ✅ Update the store instead of the computed
             auctionStore.updateBid(item.value.id, parseFloat(updatedItem.current_bid));
 
             newBid.value = null;
