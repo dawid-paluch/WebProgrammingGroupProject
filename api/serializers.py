@@ -10,11 +10,7 @@ class AuctionItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuctionItem
         fields = ['id', 'owner', 'title', 'description', 'starting_bid', 'current_bid', 'image', 'created_at', 'end_datetime']
-        read_only_fields = ['id', 'created_at', 'current_bid']
-
-    def create(self, validated_data):
-        validated_data['owner'] = 'test_user'  # Placeholder for actual user assignment logic
-        return super().create(validated_data)
+        read_only_fields = ['id', 'owner', 'created_at', 'current_bid']
     
 class ItemQuestionSerializer(serializers.ModelSerializer):
     """
@@ -23,7 +19,7 @@ class ItemQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemQuestion
         fields = ['id', 'item', 'asked_by', 'question_text', 'answer_text', 'asked_at', 'answered_at']
-        read_only_fields = ['id', 'asked_at', 'answered_at']
+        read_only_fields = ['id', 'asked_by', 'asked_at', 'answered_at']
         
 class ItemBidSerializer(serializers.ModelSerializer):
     """

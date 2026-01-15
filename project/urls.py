@@ -22,21 +22,22 @@ from django.views.generic import TemplateView
 from .views.profile import profile_data, update_profile
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import AuthenticationForm
+from django.views.decorators.csrf import ensure_csrf_cookie
 from api import views as api_views
 
 
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=AuthenticationForm), name='login'),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html', authentication_form=AuthenticationForm, redirect_authenticated_user=True), name='login'),
     path('signup/', api_views.signup, name='signup'),
     path('api/', include('api.urls')),
     path('health', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),
-    re_path(r"^.*$", TemplateView.as_view(template_name='api/spa/index.html')),
-    path('api/profile/', profile_data, name='profile_data'),
-    path('api/profile/update/', update_profile, name='update_profile'),
+    re_path(r"^.*$", login_required(ensure_csrf_cookie(TemplateView.as_view(template_name="api/spa/index.html"))), name="spa"),
 ]
 
 # Serve media files during development
