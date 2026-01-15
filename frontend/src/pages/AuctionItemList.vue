@@ -3,6 +3,9 @@
     <div class="auction-item-list">
 
         <h1>Auction Items</h1>
+        <router-link to="/new-auction-item/">
+            Create New Auction Item
+        </router-link>
 
         <input
             type="text"
@@ -50,6 +53,7 @@
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuctionStore, AuctionItem } from '../stores/auctionStore';
+import NewAuctionItem from './NewAuctionItem.vue';
 
 
 const formatEndTime = (end: string) => {
