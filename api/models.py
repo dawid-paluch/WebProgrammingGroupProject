@@ -41,7 +41,6 @@ class AuctionItem(models.Model):
         """
 
         return self.title
-<<<<<<<<< Temporary merge branch 1
 
 
 class User(AbstractUser):
@@ -63,7 +62,7 @@ class User(AbstractUser):
         Return a string representation of the User.
         """
         return self.username
-=========
+#=========
     
 
 class ItemQuestion(models.Model):
