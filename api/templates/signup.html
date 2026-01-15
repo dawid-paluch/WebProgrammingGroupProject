@@ -1,12 +1,16 @@
 <!doctype html>
 <html>
+  {% load static %}
+
   <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="stylesheet" href="{% static 'api/nonSpaStyle.css' %}">
       <title>Auction Sign Up Page</title>
   </head>
 
   <body>
+    <div id="main">
     <h1>Sign up</h1>
 
     <form method="post" novalidate>
@@ -16,7 +20,7 @@
         <label for="{{ form.username.id_for_label }}">Username</label><br />
         {{ form.username }}
         {% if form.username.errors %}
-        <div>{{ form.username.errors }}</div>
+        <div id="error">{{ form.username.errors }}</div>
         {% endif %}
       </div>
 
@@ -24,7 +28,7 @@
         <label for="{{ form.email.id_for_label }}">Email</label><br />
         {{ form.email }}
         {% if form.email.errors %}
-        <div>{{ form.email.errors }}</div>
+        <div id="error">{{ form.email.errors }}</div>
         {% endif %}
       </div>
 
@@ -32,7 +36,7 @@
         <label for="{{ form.password1.id_for_label }}">Password</label><br />
         {{ form.password1 }}
         {% if form.password1.errors %}
-        <div>{{ form.password1.errors }}</div>
+        <div id="error">{{ form.password1.errors }}</div>
         {% endif %}
       </div>
 
@@ -40,11 +44,11 @@
         <label for="{{ form.password2.id_for_label }}">Confirm Password</label><br />
         {{ form.password2 }}
         {% if form.password2.errors %}
-        <div>{{ form.password2.errors }}</div>
+        <div id="error">{{ form.password2.errors }}</div>
         {% endif %}
       </div>
 
-      <button type="submit">Create account</button>
+      <button id="signupButton" type="submit">Create account</button>
     </form>
 
     <p>
@@ -52,7 +56,8 @@
     </p>
 
     {% if form.non_field_errors %}
-    <div>{{ form.non_field_errors }}</div>
+    <div id="error">{{ form.non_field_errors }}</div>
     {% endif %}
+    </div>
   </body>
 </html>
