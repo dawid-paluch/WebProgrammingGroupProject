@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 
+const profileImageUrl = ref<string>('/static/api/spa/assets/profile-placeholder.webp');
 
 interface UserProfile {
   username: string;
@@ -21,11 +22,14 @@ function getCSRFToken(): string {
 }
 
 onMounted(async () => {
-    const res = await fetch("api/profile/");
+    const res = await fetch("/api/profile/", {
+        credentials: "same-origin"
+    });
     const data = await res.json();
     profile.value = data;
     email.value = data?.email ?? "";
     dateOfBirth.value = data?.date_of_birth ?? "";
+    profileImageUrl.value = data?.profile_image ?? '/static/api/spa/assets/profile-placeholder.webp';
 });
 
 async function saveProfile() {
@@ -38,13 +42,20 @@ async function saveProfile() {
         formData.append("profile_image", profileImage.value);
     }
 
-    await fetch("api/profile/", {
-        method: "PUT",
+    const res = await fetch("/api/profile/", {
+        method: "POST",
         headers: {
             "X-CSRFToken": getCSRFToken(),
         },
         body: formData,
+        credentials: "same-origin"
     });
+    const updated = await res.json();
+    profile.value = updated;
+
+    if (updated.profile_image) {
+        profileImageUrl.value = updated.profile_image;
+    }
 
     alert("Profile updated successfully!");
 }
@@ -52,7 +63,10 @@ async function saveProfile() {
 function onFileChange(e: Event) {
     const target = e.target as HTMLInputElement | null;
     const file = target?.files?.[0] ?? null;
-    profileImage.value = file;
+    if (file) {
+        profileImage.value = file;
+        profileImageUrl.value = URL.createObjectURL(file);
+    }
 }
 </script>
 
@@ -60,6 +74,18 @@ function onFileChange(e: Event) {
     <div class="profile-container">
         <h1>Profile</h1>
         <p>Edit your details below.</p>
+
+        <div v-if="profile" class="profile-summary">
+            <img
+                :src="profileImageUrl"
+                :alt="profileImageUrl"
+                class="profile-preview"
+            />
+
+            <p><strong>Username:</strong> {{ profile.username }}</p>
+            <p><strong>Email:</strong> {{ profile.email }}</p>
+            <p><strong>Date of Birth:</strong> {{ profile.date_of_birth || 'Not set' }}</p>
+        </div>
 
         <label for="">Email</label>
         <input v-model="email" type="email" />
@@ -129,4 +155,18 @@ function onFileChange(e: Event) {
 .profile-container button:hover {
     background-color: #2b732e;
 }
+
+.profile-container .profile-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 2rem;
+}
+
+.profile-summary {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
 </style>

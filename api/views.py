@@ -22,6 +22,7 @@ from .serializers import ItemBidSerializer
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
 
 
 @login_required
@@ -40,6 +41,42 @@ def current_user(request):
     return JsonResponse({
         "username": request.user.username
     })
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def profile_api(request):
+    user = request.user
+
+    if request.method == "GET":
+        return JsonResponse({
+            "username": user.username,
+            "email": user.email,
+            "date_of_birth": getattr(user, "date_of_birth", None),
+            "profile_image": user.profile_picture.url if getattr(user, "profile_picture", None) else None,
+        })
+
+    if request.method == "POST":
+        email = request.POST.get("email")
+        date_of_birth = request.POST.get("date_of_birth")
+        profile_image = request.FILES.get("profile_image")
+
+        if email:
+            user.email = email
+
+        if date_of_birth:
+            user.date_of_birth = date_of_birth
+
+        if profile_image:
+            user.profile_picture = profile_image
+
+        user.save()
+
+        return JsonResponse({
+            "username": user.username,
+            "email": user.email,
+            "date_of_birth": getattr(user, "date_of_birth", None),
+            "profile_image": user.profile_picture.url if getattr(user, "profile_picture", None) else None,
+        })
 
 class AuctionItemViewSet(viewsets.ModelViewSet):
     """

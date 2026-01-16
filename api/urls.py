@@ -26,4 +26,5 @@ router.register(r'item-questions', ItemQuestionViewSet, basename='itemquestion')
 urlpatterns = [
     path('', include(router.urls)),
     path('current-user/', views.current_user, name='current-user'),
+    path("profile/", views.profile_api, name="profile_api"),
 ]
