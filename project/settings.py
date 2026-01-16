@@ -36,9 +36,7 @@ SECRET_KEY = os.getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    "django-psql-persistent-web-apps-ec23380.apps.a.comp-teach.qmul.ac.uk",
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -83,6 +81,9 @@ USE_X_FORWARDED_HOST = True
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 
 ROOT_URLCONF = 'project.urls'
 
