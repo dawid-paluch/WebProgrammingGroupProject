@@ -20,13 +20,21 @@ from .serializers import ItemBidSerializer
 #from decimal import Decimalfrom django.contrib.auth
 #from decimal import login, get_user_model
 from decimal import Decimal
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 
-User = get_user_model()
-
+@login_required
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
 
+def root_view(request):
+    if request.user.is_authenticated:
+        return redirect("/app/")
+    return redirect("/login/")
+
+
+User = get_user_model()
 
 class AuctionItemViewSet(viewsets.ModelViewSet):
     """

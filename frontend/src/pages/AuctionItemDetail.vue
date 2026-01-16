@@ -89,7 +89,7 @@
           <h3>Ask a Question</h3>
           <form @submit.prevent="submitQuestion">
             <textarea v-model="newQuestion" placeholder="Type your question here..." rows="3" class="question-input" required></textarea>
-            <button type="submit" :disabled="!newQuestion || submitting">Submit Question</button>
+            <!--<button type="submit" :disabled="!newQuestion || submitting">Submit Question</button>-->
           </form>
           <p v-if="questionError" class="error-message">{{ questionError }}</p>
         </div>

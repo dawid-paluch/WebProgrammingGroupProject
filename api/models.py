@@ -42,29 +42,6 @@ class AuctionItem(models.Model):
 
         return self.title
 
-
-class User(AbstractUser):
-    """
-    Model representing a custom user in the system.
-    
-    Attributes:
-        username (str): The username of the user.
-        email (str): The email address of the user.
-        password (str): The password for the user account.
-        date_of_birth (date): The date of birth of the user.
-
-    """
-    date_of_birth = models.DateField(null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
-
-    def __str__(self):
-        """
-        Return a string representation of the User.
-        """
-        return self.username
-#=========
-    
-
 class ItemQuestion(models.Model):
 
     """
@@ -115,9 +92,6 @@ class ItemBid(models.Model):
 
     def __str__(self):
         return f"Bid of {self.amount} by {self.bidder} on {self.item.title}"
-    
-    
-
 
 class User(AbstractUser):
     """
