@@ -3,12 +3,13 @@
         <router-link v-if="$route.name !== 'Main Page'" :to="{name: 'Main Page'}" id="home-button">Home</router-link>
         
         <div id="account-menu">
-            <img
+            <!--<img
             :src="profileImageUrl"
-            alt="Profile"
-            id="profile-button"
+            alt="Profile Picture button"
+            class="profile-pic"
             @click="toggleMenu"
-            />
+            />-->
+            <button @click="toggleMenu" class="account-button">Account</button>
 
             <div v-if="menuOpen" id="account-dropdown">
                 <router-link
@@ -32,47 +33,72 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { RouterView } from "vue-router";
 
 export default defineComponent({
-    components: { RouterView },
+  components: { RouterView },
 
-    data() {
-        return {
-            menuOpen: false,
-            profileImageUrl: '/static/api/spa/assets/profile-placeholder.webp'
-        };
-    },
+  setup() {
+    const menuOpen = ref(false);
+    const profileImageUrl = ref('/static/api/spa/assets/profile-placeholder.webp');
 
-    methods: {
-        toggleMenu() {
-            this.menuOpen = !this.menuOpen;
+    // Toggle the dropdown menu
+    const toggleMenu = () => {
+      menuOpen.value = !menuOpen.value;
+    };
+
+    /*// Fetch current user profile image
+    const fetchProfileImage = async () => {
+      try {
+        const res = await fetch('/api/profile/');
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        const data = await res.json();
+        if (data.profile_image) {
+          profileImageUrl.value = data.profile_image.startsWith('/media/')
+            ? data.profile_image
+            : `/media/${data.profile_image}`;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };*/
+
+    // Logout method
+    const logout = async () => {
+      const tokenEl = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null;
+      const csrfToken = tokenEl?.content;
+
+      if (!csrfToken) {
+        console.error("CSRF token meta tag not found. Add <meta name=\"csrf-token\" content=\"{{ csrf_token }}\"> in the Django template.");
+        return;
+      }
+
+      await fetch("/logout/", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
         },
+        credentials: "same-origin",
+      });
 
-        async logout() {
-            const tokenEl = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null;
-            const csrfToken = tokenEl?.content;
-            
-            if (!csrfToken) {
-                console.error("CSRF token meta tag not found. Add <meta name=\"csrf-token\" content=\"{{ csrf_token }}\"> in the Django template.");
-                return;
-            }
+      window.location.href = "/login/";
+    };
 
-            await fetch("/logout/", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                },
-                credentials: "same-origin",
-            });
-            
-            window.location.href = "/login/";
-        },
-    },
+    onMounted(() => {
+      // fetchProfileImage();
+    });
+
+    return {
+      menuOpen,
+      profileImageUrl,
+      toggleMenu,
+      logout
+    };
+  }
 });
-
 </script>
+
 
 <style scoped>
 #logout-button {
@@ -169,5 +195,13 @@ export default defineComponent({
     border: 2px solid white;
 }
 
-
+.account-button {
+    font-size: 1.2em;
+    padding: 0.4em 1em;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
 </style>
