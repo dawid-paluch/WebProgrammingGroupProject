@@ -24,6 +24,10 @@ class AuctionItem(models.Model):
         image (Image): An optional image of the auction item.
         created_at (datetime): The date and time when the auction item was created.
         end_datetime (datetime): The date and time when the auction ends.
+        ended_processed (bool): Flag indicating if the auction end has been processed.
+        winner (ForeignKey): The user who won the auction (if any).
+        winning_bid (Decimal): The amount of the winning bid (if any).
+        winner_notified_at (datetime): The date and time when the winner was notified (if any).
 
     """
     owner = models.ForeignKey('User', on_delete=models.CASCADE)
@@ -34,6 +38,10 @@ class AuctionItem(models.Model):
     image = models.ImageField(upload_to='auction_images/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     end_datetime = models.DateTimeField()
+    ended_processed = models.BooleanField(default=False)
+    winner = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='won_auctions')
+    winning_bid = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    winner_notified_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         """
