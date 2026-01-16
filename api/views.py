@@ -17,14 +17,66 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import ItemBid
 from .serializers import ItemBidSerializer
+#from decimal import Decimalfrom django.contrib.auth
+#from decimal import login, get_user_model
 from decimal import Decimal
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
 
 
-User = get_user_model()
-
+@login_required
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
 
+def root_view(request):
+    if request.user.is_authenticated:
+        return redirect("/app/")
+    return redirect("/login/")
+
+User = get_user_model()
+
+@login_required
+def current_user(request):
+    return JsonResponse({
+        "username": request.user.username
+    })
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def profile_api(request):
+    user = request.user
+
+    if request.method == "GET":
+        return JsonResponse({
+            "username": user.username,
+            "email": user.email,
+            "date_of_birth": getattr(user, "date_of_birth", None),
+            "profile_image": user.profile_picture.url if getattr(user, "profile_picture", None) else None,
+        })
+
+    if request.method == "POST":
+        email = request.POST.get("email")
+        date_of_birth = request.POST.get("date_of_birth")
+        profile_image = request.FILES.get("profile_image")
+
+        if email:
+            user.email = email
+
+        if date_of_birth:
+            user.date_of_birth = date_of_birth
+
+        if profile_image:
+            user.profile_picture = profile_image
+
+        user.save()
+
+        return JsonResponse({
+            "username": user.username,
+            "email": user.email,
+            "date_of_birth": getattr(user, "date_of_birth", None),
+            "profile_image": user.profile_picture.url if getattr(user, "profile_picture", None) else None,
+        })
 
 class AuctionItemViewSet(viewsets.ModelViewSet):
     """
@@ -110,6 +162,10 @@ class ItemQuestionViewSet(viewsets.ModelViewSet):
         Custom action to answer a question.
         """
         question = self.get_object()
+        user = request.user
+
+        if question.item.owner != user:
+            return Response({'error': 'Only the item owner can answer questions.'}, status=status.HTTP_403_FORBIDDEN)
         answer_text = request.data.get('answer_text', '').strip()
 
         if not answer_text:

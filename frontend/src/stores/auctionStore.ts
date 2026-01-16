@@ -15,6 +15,7 @@ export interface AuctionItem {
     currentBid: number;
     imageUrl: string | null;
     endDate: string;
+    ownerUsername: string;
 }
 
 export const useAuctionStore = defineStore('auctionStore', () => {
@@ -109,6 +110,7 @@ export const useAuctionStore = defineStore('auctionStore', () => {
             currentBid: created.current_bid ? parseFloat(created.current_bid) : 0,
             imageUrl: created.image,
             endDate: created.end_datetime,
+            ownerUsername: created.ownerUsername
         });
 
         return created;

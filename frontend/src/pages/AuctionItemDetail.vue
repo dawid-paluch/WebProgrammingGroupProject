@@ -1,107 +1,89 @@
 <template>
   <div class="auction-item-detail">
-    <!-- Show item details if loaded -->
+
+    <!-- ITEM LOADED -->
     <div v-if="item">
+
       <div class="item-card">
         <h1 class="item-title">{{ item.title }}</h1>
 
-        <img
-          v-if="item.imageUrl"
-          :src="item.imageUrl"
-          alt="Auction Item Image"
-          class="item-image"
-        />
-        <img
-          v-else
-          :src="placeholderUrl"
-          alt="Placeholder Image"
-          class="item-image"
-        />
+        <img v-if="item.imageUrl" :src="item.imageUrl" class="item-image" />
+        <img v-else :src="placeholderUrl" class="item-image" />
 
         <div class="item-info">
-          <p class="description"><strong>Description:</strong> {{ item.description }}</p>
-          <p class="price"><strong>Starting Bid:</strong> ${{ item.startingBid.toFixed(2) }}</p>
-          <p class="price" :class="{ 'bid-flash': bidUpdated }">
+          <p><strong>Description:</strong> {{ item.description }}</p>
+          <p><strong>Starting Bid:</strong> ${{ item.startingBid.toFixed(2) }}</p>
+          <p :class="{ 'bid-flash': bidUpdated }">
             <strong>Current Bid:</strong> ${{ item.currentBid.toFixed(2) }}
-        </p>
-          <p class="end-time"><strong>Auction Ends:</strong> {{ formatEndDate(item.endDate) }}</p>
+          </p>
+          <p><strong>Auction Ends:</strong> {{ formatEndDate(item.endDate) }}</p>
         </div>
       </div>
 
+      <!-- PLACE BID -->
       <div class="place-bid">
-        <h3 class="place-bid-title">Place a Bid</h3>
-        <input type="number" placeholder="Enter your bid amount" class="bid-input" v-model.number="newBid" min="0" />
+        <input type="number" v-model.number="newBid" />
         <button
-            class="bid-button"
-            @click="submitBid"
-            :disabled="!newBid || newBid <= item.currentBid"
-            >
-            Submit Bid
+          @click="submitBid"
+          :disabled="!newBid || newBid <= item.currentBid"
+        >
+          Submit Bid
         </button>
-        <p v-if="bidError" class="error-message">{{ bidError }}</p>
-    </div>
-    
+        <p v-if="bidError">{{ bidError }}</p>
+      </div>
 
-      <!-- Questions & Answers section -->
+      <!-- QUESTIONS -->
       <div class="item-questions">
         <h2>Questions & Answers</h2>
+        <!--<p>DEBUG owner: {{ item.ownerUsername }}</p>
+        <p>DEBUG current: {{ currentUser }}</p>-->
 
         <div v-if="questions.length === 0">
-          <p>No questions have been asked about this item yet.</p>
+          <p>No questions yet.</p>
         </div>
 
         <div v-else>
-            <div
-                v-for="question in questions"
-                :key="question.id"
-                class="question-item"
-            >
-                <p><strong>Q:</strong> {{ question.question_text }}</p>
+          <div v-for="question in questions" :key="question.id">
+            <p><strong>Q:</strong> {{ question.question_text }}</p>
 
-                <!-- If answered -->
-                <p v-if="question.answer_text">
-                <strong>A:</strong> {{ question.answer_text }}
-                </p>
+            <p v-if="question.answer_text">
+              <strong>A:</strong> {{ question.answer_text }}
+            </p>
 
-                <!-- If NOT answered -->
-                <div v-else class="answer-form">
-                <em>No answer yet.</em>
-
-                <!-- Placeholder owner answer form -->
-                <form @submit.prevent="submitAnswer(question)">
-                    <textarea
-                    v-model="question.newAnswer"
-                    placeholder="Write an answer..."
-                    rows="2"
-                    class="question-input"
-                    required
-                    ></textarea>
-
-                    <button type="submit">
-                    Answer Question
-                    </button>
-                </form>
-                </div>
+            <div v-else-if="item.ownerUsername === currentUser">
+              <form @submit.prevent="submitAnswer(question)">
+                <textarea v-model="question.newAnswer"></textarea>
+                <button>Answer</button>
+              </form>
             </div>
-        </div>
 
-        <div class="ask-question">
-          <h3>Ask a Question</h3>
-          <form @submit.prevent="submitQuestion">
-            <textarea v-model="newQuestion" placeholder="Type your question here..." rows="3" class="question-input" required></textarea>
-            <button type="submit" :disabled="!newQuestion || submitting">Submit Question</button>
-          </form>
-          <p v-if="questionError" class="error-message">{{ questionError }}</p>
+            <div v-else>
+              <em>This question has not been answered yet.</em>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- ASK QUESTION -->
+      <div class="ask-question">
+        <form @submit.prevent="submitQuestion">
+          <textarea v-model="newQuestion"></textarea>
+          <button type="submit">Ask Question</button>
+        </form>
+        <p v-if="questionError">{{ questionError }}</p>
+      </div>
+
     </div>
 
-    <!-- Show loading message if item not yet loaded -->
+    <!-- LOADING -->
     <p v-else class="loading">Loading item details...</p>
 
-    <p v-if="fetchError" class="error-message">{{ fetchError }}</p>
+    <!-- ERROR -->
+    <p v-if="fetchError">{{ fetchError }}</p>
+
   </div>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue';
@@ -149,10 +131,11 @@ export default defineComponent({
                     startingBid: parseFloat(data.starting_bid),
                     currentBid: data.current_bid ? parseFloat(data.current_bid) : 0,
                     imageUrl: data.image,
-                    endDate: data.end_datetime
+                    endDate: data.end_datetime,
+                    ownerUsername: data.ownerUsername
                 };
 
-                auctionStore.setItem(updatedItem); // ✅ only update store
+                auctionStore.setItem(updatedItem); //only update store
             } catch (error) {
                 fetchError.value = 'Failed to load item details.';
                 console.error(error);
@@ -164,6 +147,23 @@ export default defineComponent({
             const response = await fetch(`http://127.0.0.1:8000/api/item-questions/?item_id=${itemId}`);
             if (!response.ok) throw new Error('Failed to fetch questions');
             questions.value = await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const currentUser = ref<string | null>(null);
+    const fetchCurrentUser = async () => {
+        try {
+            const response = await fetch(
+                'http://127.0.0.1:8000/api/current-user/',
+                {
+                    credentials: 'same-origin'
+                }
+            );
+            if (!response.ok) throw new Error('Failed to fetch current user');
+            const data = await response.json();
+            currentUser.value = data.username;
         } catch (error) {
             console.error(error);
         }
@@ -284,11 +284,13 @@ export default defineComponent({
             if (!isNaN(itemId)) {
                 fetchItemDetails(itemId);
                 fetchQuestions(itemId);
+                fetchCurrentUser();
             }
         });
 
         return {
             item,
+            currentUser,
             placeholderUrl,
             formatEndDate,
             newQuestion,

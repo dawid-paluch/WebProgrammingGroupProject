@@ -1,5 +1,4 @@
 <template>
-
     <div class="auction-item-list">
 
         <h1>Auction Items</h1>
@@ -124,8 +123,13 @@ export default defineComponent({
 
 .auction-item-list {
     padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 90%;
+    margin: 20px auto;
+    
+}
+
+.auction-item-list h1 {
+    margin-top: 2rem;
 }
 
 .search-bar {
