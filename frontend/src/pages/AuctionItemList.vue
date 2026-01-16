@@ -3,9 +3,6 @@
     <div class="auction-item-list">
 
         <h1>Auction Items</h1>
-        <router-link to="/new-auction-item/">
-            Create New Auction Item
-        </router-link>
 
         <input
             type="text"
