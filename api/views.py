@@ -120,6 +120,10 @@ class ItemQuestionViewSet(viewsets.ModelViewSet):
         Custom action to answer a question.
         """
         question = self.get_object()
+        user = request.user
+
+        if question.item.owner != user:
+            return Response({'error': 'Only the item owner can answer questions.'}, status=status.HTTP_403_FORBIDDEN)
         answer_text = request.data.get('answer_text', '').strip()
 
         if not answer_text:

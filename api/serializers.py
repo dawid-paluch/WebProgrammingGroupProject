@@ -7,9 +7,11 @@ class AuctionItemSerializer(serializers.ModelSerializer):
     """
     Serializer for AuctionItem model.
     """
+    ownerUsername = serializers.CharField(source='owner.username', read_only=True)
+
     class Meta:
         model = AuctionItem
-        fields = ['id', 'owner', 'title', 'description', 'starting_bid', 'current_bid', 'image', 'created_at', 'end_datetime']
+        fields = ['id', 'owner', 'title', 'description', 'starting_bid', 'current_bid', 'image', 'created_at', 'end_datetime', 'ownerUsername']
         read_only_fields = ['id', 'owner', 'created_at', 'current_bid']
     
 class ItemQuestionSerializer(serializers.ModelSerializer):
