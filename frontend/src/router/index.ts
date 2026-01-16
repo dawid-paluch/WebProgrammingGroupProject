@@ -9,13 +9,13 @@ import AuctionItemDetail from "../pages/AuctionItemDetail.vue";
 import AuctionItemList from "../pages/AuctionItemList.vue";
 import Profile from '../pages/Profile.vue';
 
-let base = (import.meta.env.MODE == 'development') ? import.meta.env.BASE_URL : ''
+//let base = (import.meta.env.MODE == 'development') ? import.meta.env.BASE_URL : ''
 
 // 2. Define some routes
 // Each route should map to a component.
 // We'll talk about nested routes later.
 const router = createRouter({
-    history: createWebHistory(base),
+    history: createWebHistory("/app/"),
     routes: [
         { path: '/', name: 'Main Page', component: AuctionItemList },
         { path: '/new-auction-item/', name: 'New Auction Item', component: NewAuctionItem },
