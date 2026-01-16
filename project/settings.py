@@ -70,6 +70,16 @@ CORS_ALLOWED_ORIGINS = [
     "https://django-psql-persistent-web-apps-ec23380.apps.a.comp-teach.qmul.ac.uk",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://django-psql-persistent-web-apps-ec23380.apps.a.comp-teach.qmul.ac.uk",
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'project.urls'
