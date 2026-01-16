@@ -3,9 +3,12 @@
         <router-link v-if="$route.name !== 'Main Page'" :to="{name: 'Main Page'}" id="home-button">Home</router-link>
         
         <div id="account-menu">
-            <button id="account-button" @click="toggleMenu">
-                Account
-            </button>
+            <img
+            :src="profileImageUrl"
+            alt="Profile"
+            id="profile-button"
+            @click="toggleMenu"
+            />
 
             <div v-if="menuOpen" id="account-dropdown">
                 <router-link
@@ -37,7 +40,8 @@ export default defineComponent({
 
     data() {
         return {
-            menuOpen: false
+            menuOpen: false,
+            profileImageUrl: '/static/api/spa/assets/profile-placeholder.webp'
         };
     },
 
@@ -154,6 +158,15 @@ export default defineComponent({
 
 .dropdown-item:hover {
     background-color: #eee;
+}
+
+#profile-button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover;
+    border: 2px solid white;
 }
 
 
