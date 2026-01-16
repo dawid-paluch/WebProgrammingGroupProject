@@ -121,7 +121,7 @@ export default defineComponent({
 
         const fetchItemDetails = async (id: number) => {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/auction-items/${id}/`);
+                const response = await fetch(`/api/auction-items/${id}/`);
                 const data = await response.json();
 
                 const updatedItem: AuctionItem = {
@@ -144,7 +144,7 @@ export default defineComponent({
 
         const fetchQuestions = async (itemId: number) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/item-questions/?item_id=${itemId}`);
+            const response = await fetch(`/api/item-questions/?item_id=${itemId}`);
             if (!response.ok) throw new Error('Failed to fetch questions');
             questions.value = await response.json();
         } catch (error) {
@@ -156,7 +156,7 @@ export default defineComponent({
     const fetchCurrentUser = async () => {
         try {
             const response = await fetch(
-                'http://127.0.0.1:8000/api/current-user/',
+                '/api/current-user/',
                 {
                     credentials: 'same-origin'
                 }
@@ -175,7 +175,7 @@ export default defineComponent({
         const csrfToken = getCookie('csrftoken');
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/item-questions/`, {
+            const response = await fetch(`/api/item-questions/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ export default defineComponent({
 
         try {
             const response = await fetch(
-            `http://127.0.0.1:8000/api/item-questions/${question.id}/answer/`,
+            `/api/item-questions/${question.id}/answer/`,
             {
                 method: 'PATCH',
                 headers: {
@@ -248,7 +248,7 @@ export default defineComponent({
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:8000/api/auction-items/${item.value.id}/place_bid/`,
+                `/api/auction-items/${item.value.id}/place_bid/`,
                 {
                     method: 'POST',
                     body: formData,

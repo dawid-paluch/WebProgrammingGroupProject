@@ -67,7 +67,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "https://django-psql-persistent-web-apps-ec23380.apps.a.comp-teach.qmul.ac.uk",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

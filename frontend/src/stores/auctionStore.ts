@@ -41,7 +41,7 @@ export const useAuctionStore = defineStore('auctionStore', () => {
     async function fetchItems(search = '') {
         try {
             const response = await fetch(
-                `http://127.0.0.1:8000/api/auction-items/?search=${encodeURIComponent(search)}`
+                `/api/auction-items/?search=${encodeURIComponent(search)}`
             );
             if (!response.ok) throw new Error('Failed to fetch auction items');
             const data = await response.json();
@@ -77,7 +77,7 @@ export const useAuctionStore = defineStore('auctionStore', () => {
 
         const csrfToken = getCookie('csrftoken');
 
-        const response = await fetch('http://127.0.0.1:8000/api/auction-items/', {
+        const response = await fetch(`/api/auction-items/`, {
             method: 'POST',
             body: formData,
             credentials: 'same-origin',
