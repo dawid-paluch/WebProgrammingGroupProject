@@ -33,8 +33,13 @@ def root_view(request):
         return redirect("/app/")
     return redirect("/login/")
 
-
 User = get_user_model()
+
+@login_required
+def current_user(request):
+    return JsonResponse({
+        "username": request.user.username
+    })
 
 class AuctionItemViewSet(viewsets.ModelViewSet):
     """

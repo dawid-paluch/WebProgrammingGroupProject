@@ -17,6 +17,7 @@ Including another URLconf
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import AuctionItemViewSet, ItemQuestionViewSet
+from api import views
 
 router = DefaultRouter()
 router.register(r'auction-items', AuctionItemViewSet, basename='auctionitem')
@@ -24,4 +25,5 @@ router.register(r'item-questions', ItemQuestionViewSet, basename='itemquestion')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('current-user/', views.current_user, name='current-user'),
 ]

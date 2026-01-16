@@ -35,6 +35,8 @@
       <!-- QUESTIONS -->
       <div class="item-questions">
         <h2>Questions & Answers</h2>
+        <!--<p>DEBUG owner: {{ item.ownerUsername }}</p>
+        <p>DEBUG current: {{ currentUser }}</p>-->
 
         <div v-if="questions.length === 0">
           <p>No questions yet.</p>
@@ -66,6 +68,7 @@
       <div class="ask-question">
         <form @submit.prevent="submitQuestion">
           <textarea v-model="newQuestion"></textarea>
+          <button type="submit">Ask Question</button>
         </form>
         <p v-if="questionError">{{ questionError }}</p>
       </div>
@@ -132,7 +135,7 @@ export default defineComponent({
                     ownerUsername: data.ownerUsername
                 };
 
-                auctionStore.setItem(updatedItem); // ✅ only update store
+                auctionStore.setItem(updatedItem); //only update store
             } catch (error) {
                 fetchError.value = 'Failed to load item details.';
                 console.error(error);
@@ -152,7 +155,12 @@ export default defineComponent({
     const currentUser = ref<string | null>(null);
     const fetchCurrentUser = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/current-user/');
+            const response = await fetch(
+                'http://127.0.0.1:8000/api/current-user/',
+                {
+                    credentials: 'same-origin'
+                }
+            );
             if (!response.ok) throw new Error('Failed to fetch current user');
             const data = await response.json();
             currentUser.value = data.username;
