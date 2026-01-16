@@ -1,5 +1,4 @@
 <template>
-
     <div class="auction-item-list">
 
         <h1>Auction Items</h1>
@@ -50,7 +49,6 @@
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuctionStore, AuctionItem } from '../stores/auctionStore';
-import NewAuctionItem from './NewAuctionItem.vue';
 
 
 const formatEndTime = (end: string) => {
@@ -125,8 +123,13 @@ export default defineComponent({
 
 .auction-item-list {
     padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: 90%;
+    margin: 20px auto;
+    
+}
+
+.auction-item-list h1 {
+    margin-top: 2rem;
 }
 
 .search-bar {

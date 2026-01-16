@@ -103,8 +103,8 @@ export default defineComponent({
 
 <style scoped>
 .new-auction-item {
-    max-width: 600px;
-    margin: 40px auto;
+    max-width: 60%;
+    margin: 5% auto;
     padding: 30px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -113,7 +113,7 @@ export default defineComponent({
     font-family: Arial , sans-serif;
 }
 
-h1 {
+.new-auction-item h1 {
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px
