@@ -72,6 +72,7 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://django-psql-persistent-web-apps-ec23380.apps.a.comp-teach.qmul.ac.uk",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://django-psql-persistent-web-apps-ec23380.apps.a.comp-teach.qmul.ac.uk",
