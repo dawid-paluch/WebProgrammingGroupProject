@@ -48,7 +48,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuctionStore, AuctionItem } from '../stores/auctionStore';
+import { useAuctionStore} from '../stores/auctionStore';
 
 
 const formatEndTime = (end: string) => {

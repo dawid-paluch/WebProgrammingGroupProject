@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { parse } from 'vue/compiler-sfc';
 
 function getCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]*)"));

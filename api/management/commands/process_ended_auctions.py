@@ -13,7 +13,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         now = timezone.now()
 
-        # Lock rows to avoid double-processing if command runs twice at once
         ended = (
             AuctionItem.objects
             .select_for_update()
@@ -29,7 +28,6 @@ class Command(BaseCommand):
                 .first()
             )
 
-            # If no bids: mark processed and continue (or notify owner if you want)
             if not top_bid:
                 item.ended_processed = True
                 item.save(update_fields=["ended_processed"])
@@ -39,7 +37,6 @@ class Command(BaseCommand):
             item.winner = winner
             item.winning_bid = top_bid.amount
 
-            # Send email
             subject = f"You won the auction: {item.title}"
             message = (
                 f"Hi {winner.username},\n\n"
@@ -49,7 +46,6 @@ class Command(BaseCommand):
                 f"Thanks,\nAuction Team"
             )
 
-            # Use winner.email (must be required at signup)
             if winner.email:
                 send_mail(
                     subject,
